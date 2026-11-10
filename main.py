@@ -7,6 +7,9 @@ from sqlmodel import Session, select
 from database import create_db_and_tables, get_session
 from models import User, Event, Registration
 
+from typing import Annotated
+
+SessionDep = Annotated[Session, Depends(get_session)]
 #TaskD2
 class UserCreate(BaseModel):
     email: str
@@ -33,7 +36,7 @@ app = FastAPI(lifespan=lifespan)
 
 
 @app.get("/events", response_model=list[Event])
-def list_events(session: Session = Depends(get_session)):
+def list_events(session: SessionDep):
     return session.exec(select(Event)).all()
 
 
@@ -70,6 +73,7 @@ def create_event(data: EventCreate, session: SessionDep):
     return event
 
 #Task E3
+"""
 @app.get("/events", response_model=list[Event])
 def list_events(
     session: SessionDep,
@@ -79,6 +83,8 @@ def list_events(
     if venue:
         query = query.where(Event.venue.contains(venue))
     return session.exec(query).all()
+
+"""
 
 
 @app.get("/events/{event_id}", response_model=Event)
